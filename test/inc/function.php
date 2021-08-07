@@ -1,6 +1,7 @@
 <?php
-define('DB_NAME','D:/localhost/intern_project/test/data/db.txt');
-function seed(){
+define('DB_NAME', 'D:/localhost/intern_project/test/data/db.txt');
+function seed()
+{
     $data = array(
         array(
             "id" => 1,
@@ -10,7 +11,7 @@ function seed(){
             "roll" => 1,
         ),
         array(
-            "id" =>2,
+            "id" => 2,
             "fname" => 'Jamal',
             "lname" => 'Ahmed',
             "age" => 9,
@@ -40,11 +41,12 @@ function seed(){
     );
 
     $serializeData = serialize($data);
-    file_put_contents(DB_NAME,$serializeData,LOCK_EX);
+    file_put_contents(DB_NAME, $serializeData, LOCK_EX);
 
 }
 
-function generateReport(){
+function generateReport()
+{
     $serializeData = file_get_contents(DB_NAME);
     $students = unserialize($serializeData);
     ?>
@@ -57,10 +59,10 @@ function generateReport(){
         </tr>
         <?php foreach ($students as $student) { ?>
             <tr>
-                <td><?php printf('%s %s',$student['fname'],$student['lname'])?></td>
-                <td><?php printf('%s',$student['roll'])?></td>
-                <td><?php printf('%s',$student['age'])?></td>
-                <td><?php printf('<a href="/test/index.php?task=edit&id=%s">Edit</a>|<a href="/test/index.php?task=delete&id=%s">Delete</a>',$student['id'],$student['id'])?></td>
+                <td><?php printf('%s %s', $student['fname'], $student['lname']) ?></td>
+                <td><?php printf('%s', $student['roll']) ?></td>
+                <td><?php printf('%s', $student['age']) ?></td>
+                <td><?php printf('<a href="/test/index.php?task=edit&id=%s">Edit</a>|<a href="/test/index.php?task=delete&id=%s">Delete</a>', $student['id'], $student['id']) ?></td>
             </tr>
         <?php } ?>
     </table>
@@ -68,33 +70,77 @@ function generateReport(){
 
 }
 
-    function addStudent($fname,$lname,$age,$roll){
-        $serializedData = file_get_contents(DB_NAME);
-        $students = unserialize($serializedData);
+function addStudent($fname, $lname, $age, $roll)
+{
+    $found = false;
+    $serializedData = file_get_contents(DB_NAME);
+    $students = unserialize($serializedData);
 
-        foreach ($students as $_student){
-            if($_student['roll'] == $roll){
-                $found = true;
-                break ;
-            }
+    foreach ($students as $_student) {
+        if ($_student['roll'] == $roll) {
+            $found = true;
+            break;
         }
-
-        if(!$found){
-            $newId = count($students) + 1 ;
-            $student = array(
-                'id' => $newId,
-                'fname' => $fname,
-                'lname' => $lname,
-                'age' => $age,
-                'roll' => $roll,
-            );
-
-            array_push($students,$student);
-            $serializedData = serialize($students);
-            file_put_contents(DB_NAME,$serializedData,LOCK_EX);
-
-            return true;
-        }
-        return false;
     }
+
+    if (!$found) {
+        $newId = count($students) + 1;
+        $student = array(
+            'id' => $newId,
+            'fname' => $fname,
+            'lname' => $lname,
+            'age' => $age,
+            'roll' => $roll,
+        );
+
+        array_push($students, $student);
+        $serializedData = serialize($students);
+        file_put_contents(DB_NAME, $serializedData, LOCK_EX);
+
+        return true;
+    }
+    return false;
+}
+
+function getStudent($id)
+{
+    $serializedData = file_get_contents(DB_NAME);
+    $students = unserialize($serializedData);
+
+
+    foreach ($students as $student) {
+        if ($student['id'] == $id) {
+            return $student;
+        }
+    }
+    return  false;
+}
+
+function updateStudent($id,$fname, $lname, $age, $roll)
+{
+    $found = false;
+    $serializedData = file_get_contents(DB_NAME);
+    $students = unserialize($serializedData);
+
+    foreach ($students as $_student) {
+
+        if ($_student['roll'] == $roll & $_student['id'] != $id) {
+            $found = true;
+            break;
+        }
+    }
+
+    if (!$found) {
+        $students[$id-1]['fname'] = $fname;
+        $students[$id-1]['lname'] = $lname;
+        $students[$id-1]['age'] = $age;
+        $students[$id-1]['roll'] = $roll;
+
+        $serializedData = serialize($students);
+        file_put_contents(DB_NAME, $serializedData, LOCK_EX);
+
+        return true;
+    }
+    return false;
+}
 

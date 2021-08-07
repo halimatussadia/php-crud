@@ -11,22 +11,39 @@ $fname = '';
 $lname = '';
 $roll = '';
 $age = '';
+$id = '';
 if(isset($_POST['submit'])){
     $fname = filter_input(INPUT_POST,'fname',FILTER_SANITIZE_STRING);
     $lname = filter_input(INPUT_POST,'lname',FILTER_SANITIZE_STRING);
     $roll = filter_input(INPUT_POST,'roll',FILTER_SANITIZE_STRING);
     $age = filter_input(INPUT_POST,'age',FILTER_SANITIZE_STRING);
+    $id = filter_input(INPUT_POST,'id',FILTER_SANITIZE_STRING);
 
-    if($fname != '' && $lname != '' && $age != '' && $roll != ''){
-        $result = addStudent($fname,$lname,$age,$roll);
+    if($id){
+        if($fname != '' && $lname != '' && $age != '' && $roll != ''){
+            $result = updateStudent($id,$fname,$lname,$age,$roll);
 
-        if($result){
-            header('location: /test/index.php?task=report');
-        }else{
-            $error = 1;
+            if($result){
+                header('location: /test/index.php?task=report');
+            }else{
+                $error = 1;
+            }
+
         }
+    }else{
+        if($fname != '' && $lname != '' && $age != '' && $roll != ''){
+            $result = addStudent($fname,$lname,$age,$roll);
 
+            if($result){
+                header('location: /test/index.php?task=report');
+            }else{
+                $error = 1;
+            }
+
+        }
     }
+
+
 }
 
 ?>
@@ -110,6 +127,43 @@ if(isset($_POST['submit'])){
                     <div class="form-group">
                         <label for="email">Age</label>
                         <input type="number" name="age"  value="<?php echo $age?>"
+                               class="form-control" id="email" aria-describedby="emailHelp"
+                               placeholder="Enter your age">
+                    </div>
+                    <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    <?php endif ?>
+
+
+    <?php if ('edit' == $task) : ?>
+    <?php $student = getStudent($_GET['id'])  ?>
+        <div class="row">
+            <form method="post">
+                <div>
+                    <input type="hidden" name="id" value="<?php echo $_GET['id'] ?>">
+                    <div class="form-group">
+                        <label for="email">First Name</label>
+                        <input type="text" name="fname" value="<?php echo $student['fname']?>"
+                               class="form-control" id="email" aria-describedby="emailHelp"
+                               placeholder="Enter First Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Last Name</label>
+                        <input type="text" name="lname"  value="<?php echo $student['lname']?>"
+                               class="form-control" id="email" aria-describedby="emailHelp"
+                               placeholder="Enter Last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Roll</label>
+                        <input type="number" name="roll"  value="<?php echo $student['roll']?>"
+                               class="form-control" id="email" aria-describedby="emailHelp"
+                               placeholder="Enter your roll">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Age</label>
+                        <input type="number" name="age"  value="<?php echo $student['age']?>"
                                class="form-control" id="email" aria-describedby="emailHelp"
                                placeholder="Enter your age">
                     </div>
